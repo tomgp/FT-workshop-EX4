@@ -10,8 +10,8 @@ function makeModel(){
 	}
 
 	model.set = function(o){
-		if(o.x) model.x = o.x;
-		if(o.y) model.y = o.y;
+		if(!isNaN(o.x)) model.x = o.x;
+		if(!isNaN(o.y)) model.y = o.y;
 		model.dispatch.change(model);	//notify of a change
 	}
 
@@ -42,15 +42,15 @@ function drawMainVis(model){
 	console.log('change', model);
 	var mainVis = d3.select('.main-vis');
 
-	mainVis.selectAll('circle')
+	mainVis.selectAll('use')
 		.data([model])
 			.enter()
-		.append('circle');
+		.append('g')
+		.append('use')
+			.attr('xlink:href','graphics/arrows.svg#icecream');
 	
-	mainVis.selectAll('circle').attr({
-		cx:function(d){return d.x},
-		cy:function(d){return d.y},
-		r:20
+	mainVis.selectAll('g').attr({
+		transform:function(d){ return 'translate(' + (d.x-50) + ',' +(d.y-50)+')' }
 	});
 }
 
