@@ -4,13 +4,15 @@ var d3 = require('d3');
 
 function makeModel(){
 	var model = {
-		x:250, y:250
+		x:250, 
+		y:250,
+		dispatch:d3.dispatch('change')
 	}
 
 	model.set = function(o){
 		if(o.x) model.x = o.x;
 		if(o.y) model.y = o.y;
-		console.log('set', o);
+		model.dispatch.change(model);	//notify of a change
 	}
 
 	return model;
@@ -31,18 +33,26 @@ d3.select('.app')
 			x:d3.mouse(this)[0],
 			y:d3.mouse(this)[1]
 		});
-		d3.select(this).selectAll('circle')
-			.data([myModel])
-				.enter()
-			.append('circle');
-		
-		d3.select(this).selectAll('circle').attr({
-			cx:function(d){return d.x},
-			cy:function(d){return d.y},
-			r:20
-		});
-
 	});
+
+myModel.dispatch.on('change.main', drawMainVis);
+drawMainVis(myModel);
+
+function drawMainVis(model){
+	console.log('change', model);
+	var mainVis = d3.select('.main-vis');
+
+	mainVis.selectAll('circle')
+		.data([model])
+			.enter()
+		.append('circle');
+	
+	mainVis.selectAll('circle').attr({
+		cx:function(d){return d.x},
+		cy:function(d){return d.y},
+		r:20
+	});
+}
 
 //create the 'y' vis
 
@@ -54,25 +64,31 @@ d3.select('.app')
 			'class':'y-vis'
 		})
 	.on('click', function(){
-
 		myModel.set({
 			y:d3.mouse(this)[1]
 		});
+	});
 
-		d3.select(this).selectAll('g')
-			.data([myModel])
-				.enter()
-			.append('g')
-			.append('use')
-				.attr('xlink:href','graphics/arrows.svg#left');
-		
-		d3.select(this).selectAll('g').attr({
-			'transform':function(d){
-				return 'translate(0,'+(d.y-50)+')'}
-		});
-	})
+myModel.dispatch.on('change.y', drawYVis);
+drawYVis(myModel);
 
-//the 'y' vis
+function drawYVis(model){
+	var yVis = d3.select('.y-vis');
+
+	yVis.selectAll('g')
+		.data([model])
+			.enter()
+		.append('g')
+		.append('use')
+			.attr('xlink:href','graphics/arrows.svg#left');
+	
+	yVis.selectAll('g').attr({
+		'transform':function(d){
+			return 'translate(0,'+(d.y-50)+')'}
+	});
+};
+
+//the 'x' vis
 d3.select('.app')
 	.append('svg')
 		.attr({
@@ -81,20 +97,26 @@ d3.select('.app')
 			'class':'x-vis'
 		})
 	.on('click', function(){
-
 		myModel.set({
 			x:d3.mouse(this)[0]
 		});
+	});
 
-		d3.select(this).selectAll('g')
-			.data([myModel])
-			.enter()
-			.append('g')
-			.append('use')
-				.attr('xlink:href','graphics/arrows.svg#up');
-		
-		d3.select(this).selectAll('g').attr({
-			'transform':function(d){
-				return 'translate('+(d.x-50)+',0)'}
-		});
-	})
+myModel.dispatch.on('change.x', drawXVis);
+drawXVis(myModel);
+
+function drawXVis(model){
+	var xVis = d3.select('.x-vis');
+
+	xVis.selectAll('g')
+		.data([myModel])
+		.enter()
+		.append('g')
+		.append('use')
+			.attr('xlink:href','graphics/arrows.svg#up');
+	
+	xVis.selectAll('g').attr({
+		'transform':function(d){
+			return 'translate('+(d.x-50)+',0)'}
+	});
+}
