@@ -59,3 +59,19 @@ dispatcher.on('myEvent.b', function(){
 //do another thing });
 ```
 
+###Provide an 'official' way to modify the model
+
+The model should have an event dispatcher as a property so it can signal to the outside world when it changes but in order to actually trigger that signal we need the model to notice whe it has changed. THe easiest way to do this is by providing it with a set method via which the rest of the app must adjust its properties
+somrthing like
+
+```
+function X(x){
+	if(!x) return model.x;
+	model.x = x;
+	dispatcher.change(model);
+}
+```
+
+note: the dispacher's function call passes the `model` as an argument, this is an easy way to ensure any listener has access to its properties.
+
+####branch: make-an-event-dispatcher
