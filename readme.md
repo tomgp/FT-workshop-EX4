@@ -75,3 +75,7 @@ function X(x){
 note: the dispacher's function call passes the `model` as an argument, this is an easy way to ensure any listener has access to its properties.
 
 ####branch: make-an-event-dispatcher
+
+####branch: modularise
+
+####branch: refactor nicely
